@@ -84,10 +84,22 @@ namespace UAECovidAPI.Controllers
                 SecurityStamp = Guid.NewGuid().ToString(),
                 UserName = model.UserName
             };
+            
             var result = await userManager.CreateAsync(user, model.Password);
             if (!result.Succeeded)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User creation failed! Please check user details and try again." });
+            //only for first time - only one user.. used for internal use
+            if (model.UserName == "admin")
+            {
+                if (!await roleManager.RoleExistsAsync(UserRoles.Admin))
+                    await roleManager.CreateAsync(new IdentityRole(UserRoles.Admin));
 
+
+                if (await roleManager.RoleExistsAsync(UserRoles.Admin))
+                {
+                    await userManager.AddToRoleAsync(user, UserRoles.Admin);
+                }
+            }
             return Ok(new Response { Status = "Success", Message = "User created successfully!" });
         }
 
