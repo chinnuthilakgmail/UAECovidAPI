@@ -145,7 +145,7 @@ namespace UAECovidAPI
                 endpoints.MapControllers();
             });
 
-           
+           //test
         }
     }
 }
