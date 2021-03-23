@@ -20,8 +20,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UAECovidAPI.Authentication;
-using UAECovidAPI.DataAccess;
-using UAECovidAPI.DataClass;
+using UAECovidAPI.Data; 
 
 namespace UAECovidAPI
 {
@@ -46,11 +45,13 @@ namespace UAECovidAPI
            //    c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
            //});
        
-            services.AddTransient<ICountryData, CountryData>();
-            services.AddTransient<ISqlDataAccess, SqlDataAccess>();
+            //services.AddTransient<ICountryData, CountryData>();
+            //services.AddTransient<ISqlDataAccess, SqlDataAccess>();
 
             // For Entity Framework
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString(ConnectionStrings.AspNetDatabase.ToString())));
+
+            services.AddDbContext<CovidDBContext>(options=> options.UseSqlServer(Configuration.GetConnectionString(ConnectionStrings.CovidAPIDatabase.ToString())));
 
             // For Identity
             services.AddIdentity<ApplicationUser, IdentityRole>()

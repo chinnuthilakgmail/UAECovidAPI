@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace UAECovidAPI.DataClass
+namespace UAECovidAPI.Models
 {
     public class Response
     {
@@ -12,4 +12,6 @@ namespace UAECovidAPI.DataClass
 
         public object Data { get; set; }
     }
+
+    
 }

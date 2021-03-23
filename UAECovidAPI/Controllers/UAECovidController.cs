@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using UAECovidAPI.Authentication;
-using UAECovidAPI.DataClass;
+using UAECovidAPI.Data; 
 using UAECovidAPI.Models;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -17,12 +18,13 @@ namespace UAECovidAPI.Controllers
     [Authorize]
     [ApiController]
     public class UAECovidController : ControllerBase
-    {
-        private readonly ICountryData _country;
+    { 
+        private readonly CovidDBContext context;
 
-        public UAECovidController(ICountryData country)
+        public UAECovidController( CovidDBContext context)
         {
-            _country = country;
+             
+            this.context = context;
         }
 
         [HttpGet]
@@ -147,20 +149,20 @@ namespace UAECovidAPI.Controllers
         [HttpPost]
         [Authorize(Roles = UserRoles.Admin)]
         [Route("AddCountry")]
-        public IActionResult AddCountryToDB(CountryClass country)
+        public async Task<IActionResult> AddCountryToDB(CountryClass country)
         {
             if (ModelState.IsValid)
             {
-                int retValue = _country.AddCountry(country);
-                if (retValue == 1)
+                try
                 {
-                    return Ok(new Response { Status = "Success", Message = "Successful Insertion. Country Id in Data field", Data = country.Id });
+                    context.Countries.Add(new CountryClass { Country = country.Country,Slug = country.Slug,Code = country.Code});
+                    await context.SaveChangesAsync();
+                    return Ok(new Response { Status = "Success", Message = "Successful Insertion", Data = country.Id });
                 }
-                else
+                catch (DbUpdateException ex)
                 {
-                    return Ok(new Response { Status = "Error", Message = "Country already exists", Data = 0 });
-                }
-
+                    return Ok(new Response { Status = "Error", Message = ex.Message, Data = null });
+                } 
             }
             return BadRequest();
         }
@@ -168,24 +170,22 @@ namespace UAECovidAPI.Controllers
         [HttpPut]
         [Authorize(Roles = UserRoles.Admin)]
         [Route("UpdateCountry")]
-        public IActionResult UpdateCountry(CountryClass country)
+        public async Task<IActionResult> UpdateCountry(CountryClass country)
         {
             if (ModelState.IsValid)
             {
-                int retValue = _country.UpdateCountry(country);
-                if (retValue == 1)
+                try
                 {
-                    return Ok(new Response { Status="Success",Message="Update Success",Data = null });
+                    context.Countries.Update(country);
+                    await context.SaveChangesAsync();
+                    return Ok(new Response { Status = "Success", Message = "Update Success", Data = null });
                 }
-                else if (retValue == 0)
+                catch (DbUpdateException ex)
                 {
-                    return Ok(new Response { Status = "Error", Message = "Update Failed", Data = null });
+                    return Ok(new Response { Status = "Error", Message = ex.Message, Data = null });
                 }
-                else
-                {
-                    return Ok(retValue);
-                }
-                
+                 
+
             }
             return BadRequest();
         }
@@ -193,23 +193,22 @@ namespace UAECovidAPI.Controllers
         [HttpDelete]
         [Authorize(Roles = UserRoles.Admin)]
         [Route("DeleteCountry")]
-        public IActionResult DeleteCountry(int countryCode)
+        public async Task<IActionResult> DeleteCountry(int countryCode)
         {
             if (ModelState.IsValid)
             {
-                int retValue = _country.DeleteCountry(countryCode);
-                if (retValue == 1)
+                try
                 {
+                    CountryClass country = context.Countries.Where(x => x.Id == countryCode).FirstOrDefault();
+                    context.Countries.Remove(country);
+                    await context.SaveChangesAsync();
                     return Ok(new Response { Status = "Success", Message = "Delete Success", Data = null });
                 }
-                else if (retValue == 0)
+                catch (DbUpdateException ex)
                 {
-                    return Ok(new Response { Status = "Error", Message = "Delete Failed", Data = null });
+                    return Ok(new Response { Status = "Error", Message = ex.Message, Data = null });
                 }
-                else
-                {
-                    return Ok(retValue);
-                }
+                 
             }
             return BadRequest();
         }
@@ -218,9 +217,8 @@ namespace UAECovidAPI.Controllers
         [AllowAnonymous]
         [Route("GetAllCountries")]
         public IActionResult GetAllCountries()
-        {
-
-            List<CountryClass> allCountries = _country.GetAllCountries();
+        { 
+            List<CountryClass> allCountries = context.Countries.ToList();
             return Ok(new Response { Status="Success",Message="Successful" , Data = allCountries } );
 
         }
@@ -229,8 +227,8 @@ namespace UAECovidAPI.Controllers
         [Authorize(Roles = UserRoles.Admin)]
         [Route("GetCountry")]
         public IActionResult GetCountry(int Id)
-        {
-            CountryClass country = _country.GetCountry(Id);
+        { 
+            CountryClass country = context.Countries.Where(x => x.Id == Id).FirstOrDefault();
             return Ok(new Response { Status = "Success", Message = "Successful", Data = country });
 
         }

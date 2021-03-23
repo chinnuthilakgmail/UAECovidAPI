@@ -13,7 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
  
 using UAECovidAPI.Authentication;
-using UAECovidAPI.DataClass;
+using UAECovidAPI.Models;
 
 namespace UAECovidAPI.Controllers
 {
