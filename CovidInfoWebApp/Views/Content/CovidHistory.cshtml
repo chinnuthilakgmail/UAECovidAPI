@@ -1,0 +1,129 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model IEnumerable<CovidInfoWebApp.Models.CovidHistory>
+
+@{
+    ViewData["Title"] = "CovidHistory";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h4>Covid History</h4>
+@Html.DropDownList("slug", (List<SelectListItem>)ViewBag.AllCountries, "--Select Country--", new { onchange = "document.location.href = '/Content/CovidHistory?slug=' + this.options[this.selectedIndex].value;" })
+
+@if (Model != null)
+{
+    <table id="sampleTableA" style="width:100%"
+           class="table table-striped sampleTable">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Country)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.CountryCode)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Province)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.City)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.CityCode)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Lat)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Lon)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Confirmed)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Deaths)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Recovered)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Active)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Date)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Country)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CountryCode)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Province)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.City)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CityCode)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Lat)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Lon)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Confirmed)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Deaths)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Recovered)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Active)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Date)
+                    </td>
+                    <td>
+                        @*@Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+                            @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
+                            @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })*@
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+ 
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js.geotools/dist/geotools.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js.geotools/dist/geotools-swedish-zipcodes.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.24.0/moment.min.js"></script>
+    <script src="~/js/fancyTable.js"></script>
+
+    <script type="text/javascript"> 
+        $(document).ready(function () {            
+            var fancyTableA = $("#sampleTableA").fancyTable({
+                sortColumn: 0,
+                pagination: true,
+                perPage: 5,
+                globalSearch: true
+            });
+        });
+    </script>
+}
